@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nachrichten aus 🇩🇪</title>
+    <title>Sportnachrichten</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Aktuelle Nachrichten</h1>
+        <h1>Aktuelle Sportnachrichten</h1>
         <div id="news-container">
-            <?php include 'news_fetcher.php'; ?>
+            <?php include 'sportnews_fetcher.php'; ?>
         </div>
         <div class="update-info">
             Letzte Aktualisierung: <span id="last-update-time"><?php echo date('H:i:s'); ?></span>
@@ -18,31 +18,23 @@
         </div>
     </div>
     <script>
-        if ('serviceWorker' in navigator && 'SyncManager' in window) {
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
             navigator.serviceWorker.register('service-worker.js').then(function(reg) {
                 return navigator.serviceWorker.ready;
             }).then(function(reg) {
                 Notification.requestPermission().then(function(permission) {
                     if (permission === 'granted') {
-                        reg.sync.register('news-fetch');
+                        reg.sync.register('sport-news-fetch');
                     }
                 });
             });
-
-            navigator.serviceWorker.addEventListener('message', function(event) {
-                if (event.data.type === 'get-titles') {
-                    event.ports[0].postMessage({ titles: JSON.parse(localStorage.getItem('titles') || '[]') });
-                } else if (event.data.type === 'set-titles') {
-                    localStorage.setItem('titles', JSON.stringify(event.data.titles));
-                }
-            });
         } else {
-            console.log('Service Worker or Background Sync not supported');
+            console.log('Service Worker or Push notifications are not supported');
         }
 
         function updateNews() {
             var xhr = new XMLHttpRequest();
-            xhr.open('GET', 'news_fetcher.php', true);
+            xhr.open('GET', 'sportnews_fetcher.php', true);
             xhr.onload = function () {
                 if (xhr.status === 200) {
                     document.getElementById('news-container').innerHTML = xhr.responseText;
@@ -75,7 +67,7 @@
             }
         }
 
-        setInterval(updateCountdown, 1000);
+        setInterval(updateCountdown, 1000); // Update countdown every second
         resetCountdown();
     </script>
 </body>
